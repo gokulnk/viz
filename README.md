@@ -10,11 +10,11 @@ https://github.com/gokulnk/viz/blob/master/Table_1_PR_Districts_TRU.xls
 
 Structure : 
 
-<code>
-<g title="Bihar" entity_type="state" entity_id="10">
 
-<path title="Paschim Champaran" entity_type="district" entity_id="1" d="M 582.47648,570.42447 . L 582.47648,570.42447 z" ></path>
-</code>
+  <g title="Bihar" entity_type="state" entity_id="10">
+
+  <path title="Paschim Champaran" entity_type="district" entity_id="1" d="M 582.47648,570.42447 . L 582.47648,570.42447 z" ></path>
+
 
 Demo : http://gokulnk.blogspot.in/2013/09/india-map-of-sex-ratios-districtwise.html
 
