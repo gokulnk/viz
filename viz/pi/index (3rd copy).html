@@ -1,0 +1,187 @@
+<html>
+	<head>
+		<meta charset="utf-8">
+		<title>D3 Test</title>
+		<style>
+			
+		</style>
+		<script type="text/javascript" src="../d3.js"></script>
+		<script type="text/javascript" src="../lib/colorbrewer/colorbrewer.js"></script>
+		<link type="text/css" rel="stylesheet" media="all" href="../lib/colorbrewer/colorbrewer.css">
+	</head>
+	<body>
+
+<script type="text/javascript">
+
+var lineColor = "white";
+var lineWidth = 2;
+var graphBackGround = "#505050";
+var textColor = "white";
+var graphWidth = 1200;
+var graphHeight = 300 ;
+var minTextSize = 17;
+var maxTextSize = 17;
+var valuePrefix = "";
+var valuePostfix = "PI";
+var minRadius = 8;
+var maxRadius = 11;
+
+var colorPalette = ["#61a0d6" ,  "#95bb4a" , "#2f3485",  "#dcc42c",  "#f3d25f", "#c42278",  "#d5882e",  "#4b8354"];
+var rawData = [
+   {   "value":1.7, "label":"Vacio", "date":"23-1-2013"},
+   {  "value":7.2, "label":"Manhata d Exam", "date":"24-1-2013"},
+   {  "value":9.7, "label":"Los he aprebade", "date":"26-1-2013"},
+   {  "value":1.9, "label":"Tempo Rita", "date":"21-2-2013"},
+   { "value":2.3, "label":"Alabana", "date":"18-3-2013"},
+   { "value":4.8, "label":"Felicidad", "date":"17-4-2013"},
+   { "value":6.9, "label":"Incipalo", "date":"15-5-2013"},
+   { "value":8.2, "label":"Balera", "date":"12-6-2013"},
+   { "value":2.9, "label":"Bukata", "date":"01-12-2013"}];
+
+var valueArray = [];
+rawData.forEach(function(d){
+	valueArray.push(d.value);
+});
+
+
+var bodySelection = d3.select("body");
+var svgSelection = bodySelection.append("svg")
+                                 .attr("width", graphWidth) 
+                                 .attr("height", graphHeight)
+			;
+var rec = svgSelection.append("rect")
+			 .attr("x", 0) 
+                                 .attr("y", 0)
+			 .attr("width", graphWidth) 
+                                 .attr("height", graphHeight)
+			 .style("fill", graphBackGround);
+
+var xScale = d3.scale.linear().domain([ 0, rawData.length]).range([ 0, graphWidth]);
+var yScale = d3.scale.linear().domain([ d3.min(valueArray), d3.max(valueArray)]).range([ graphHeight-70, 70]);	
+var radiusScale = d3.scale.linear().domain([ d3.min(valueArray), d3.max(valueArray)]).range([ minRadius,maxRadius]);	
+var textScale = d3.scale.linear().domain([ d3.min(valueArray), d3.max(valueArray)]).range([ minTextSize,maxTextSize]);			
+
+var lineFunction = d3.svg.line()
+                          .x(function(d,i) { return xScale(i); })
+                          .y(function(d) { return yScale(d.value);})
+                        .interpolate("linear");
+//The line SVG Path we draw
+var lineGraph = svgSelection.append("g") .attr("transform", "translate(0,0)").append("path")
+                            .attr("d", lineFunction(rawData))
+                            .attr("stroke", "white")
+                            .attr("stroke-width", lineWidth)
+                            .attr("fill", "none");
+   
+var circles = svgSelection.append("g").attr("transform", "translate(0,0)").selectAll("circle")
+                           .data(rawData)
+                             .enter()
+                            .append("circle");  
+
+var circleAttribute = circles.attr("cx", function(d, i) {return xScale(i); } )
+                                                    .attr("cy",function(d){return yScale(d.value);})
+					.attr("r", function(d){return radiusScale(d.value);})
+					.style("fill", function(d,i){return colorPalette[i%(colorPalette.length)];});
+					
+
+
+function textValueY(d) {
+	var yOffset = 30; // TODO : Find out the current radius and then displace by that amount
+	return (yScale(d.value) + yOffset);
+}
+
+function textValueX(d, i) {
+	var xOffset = 30; // TODO : Find out the current radius and then displace by that amount
+	if (i ==0) {
+		xOffset = 0;
+	}
+	return (xScale(i) + xOffset);
+}
+
+function textValue(d) {
+	
+	var label =  "" + d.value ;
+	label = label.replace('.', ',');
+	return label;
+}
+
+
+var bubbleSelection = svgSelection.append("g") .attr("transform", "translate(0,0)").selectAll("path.bubble")
+			.data(rawData)
+			.enter()
+			.append("path").attr("class", "bubble");
+
+function bubbleOrigin(d,i) {
+	var xOffset = textValueX(d,i) - 60;
+	var yOffset = textValueY(d) - 40
+	return "translate(" + xOffset +","+ yOffset + ")";
+}
+ var bubble = bubbleSelection.attr("d", "M 10 25  L 10 75 L 120 75  L 120 25  M 10 25")
+		.attr("transform", function(d, i){return bubbleOrigin(d, i)} )
+		.attr("stroke", function(d,i){return colorPalette[i%(colorPalette.length)];})
+		.attr("fill", function(d,i){return colorPalette[i%(colorPalette.length)];})
+		;
+
+var text = svgSelection.append("g").attr("transform", "translate(0,0)").selectAll("text")
+                        .data(rawData)
+                        .enter()
+                        .append("text");	
+
+
+var textLabels = text
+                 .attr("x", function(d, i) {  return textValueX(d,i); })
+                 .attr("y", function(d) { return textValueY(d);})
+                 .text( function (d) { return textValue(d);})
+                 .attr("font-family", "sans-serif")
+                 .attr("font-size", function(d) { return textScale(d.value);})
+                 .attr("fill", "white");
+
+
+		 
+var postFixSelection = svgSelection.append("g").attr("transform", "translate(0,0)").selectAll("text.postfix")
+                        .data(rawData)
+                        .enter()
+                        .append("text").attr("class", "postfix");
+
+
+var postFix = postFixSelection
+                 .attr("x", function(d, i) {  return textValueX(d,i)+30; })
+                 .attr("y", function(d) { return textValueY(d);})
+                 .text( function (d) { return valuePostfix;})
+                 .attr("font-family", "sans-serif")
+                 .attr("font-size", function(d) { return textScale(d.value)-3;})
+                 .attr("fill", "white");
+					
+var labelSelection = svgSelection.append("g").attr("transform", "translate(0,0)").selectAll("text.label")
+                        .data(rawData)
+                        .enter()
+                        .append("text").attr("class", "label");
+
+
+var label = labelSelection
+                 .attr("x", function(d, i) {  return textValueX(d,i) - 30; })
+                 .attr("y", function(d) { return textValueY(d) +50;})
+                 .text( function (d) { return d.label;})
+                 .attr("font-family", "sans-serif")
+                 .attr("font-size", function(d) { return textScale(d.value)-3;})
+                 .attr("fill", "white");
+
+var dateSelection = svgSelection.append("g").attr("transform", "translate(0,0)").selectAll("text.date")
+                        .data(rawData)
+                        .enter()
+                        .append("text").attr("class", "date");
+
+
+var date = dateSelection
+                 .attr("x", function(d, i) {  return textValueX(d,i) -5; })
+                 .attr("y", function(d) { return textValueY(d) +70;})
+                 .text( function (d) { return d.date;})
+                 .attr("font-family", "sans-serif")
+                 .attr("font-size", function(d) { return textScale(d.value)-6;})
+                 .attr("fill", "white");
+		 
+
+
+
+	</script>
+	</body>
+</html>

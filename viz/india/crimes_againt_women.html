@@ -1,0 +1,44 @@
+<html>
+	<head>
+		<meta charset="utf-8">
+		<title>Sex Ratio : India Census 2011</title>
+		<style>
+			div.tooltip {
+			position: absolute;
+			text-align: center;
+			width: 120px;
+			height: 120px;
+			padding: 2px;
+			font: 10px sans-serif;
+			background: lightgrey;
+			border: 0px;
+			border-radius: 12px;
+			pointer-events: none;
+			}
+			g:hover{
+				fill : black;
+			}
+			
+			path:hover{
+				fill : red;
+			}
+		</style>
+		<script type="text/javascript" src="../../lib/d3/d3.js"></script>
+		<script type="text/javascript" src="../../lib/colorbrewer/colorbrewer.js"></script>
+		<link type="text/css" rel="stylesheet" media="all" href="../../lib/colorbrewer/colorbrewer.css">
+	</head>
+	<body>
+		<div>Crimes against Women</div>
+
+		<script type="text/javascript">
+
+
+		//districts.foreach(districts as dist)
+			console.log('All is well');
+			d3.xml("../../assets/India_states.svg", function(xml) {
+				document.body.appendChild(xml.documentElement);
+				});
+			
+		</script>
+	</body>
+</html>
